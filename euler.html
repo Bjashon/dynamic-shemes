@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Круги Эйлера для двух множеств</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#000000;
+      --muted:#333333;
+      --line:rgba(0,0,0,.18);
+      --soft:rgba(0,0,0,.05);
+      --soft2:rgba(0,0,0,.08);
+    }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:18px;}
+    .card{
+      background:#fff;
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.07);
+    }
+    h1{
+      font-size:18px;
+      margin:0 0 10px;
+      font-weight:650;
+      text-align:center;
+    }
+    .muted{color:var(--muted); font-size:13px; line-height:1.35;}
+    .muted div{margin:2px 0;}
+
+    /* ---- Controls row layout ---- */
+    .controlsLine{
+      margin-top:12px;
+      display:flex;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+
+    /* Left: buttons block */
+    .leftBlock{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-start;
+    }
+
+    /* Clickable "grey button" overline above buttons */
+.toggleLine{
+  width:100%;
+  max-width: 420px;              /* ширину ты уже подгоняешь JS-ом */
+  height:18px;                   /* чуть выше, как у кнопки */
+  cursor:pointer;
+  user-select:none;
+  position:relative;
+
+  /* вид как у серых кнопок */
+  border:1px solid var(--line);
+  background:var(--soft);
+  border-radius:999px;
+}
+.toggleLine:hover{ background:var(--soft2); }
+.toggleLine:active{ transform: translateY(1px); }
+
+/* Внутренняя полоска (по умолчанию скрыта) */
+.toggleLine::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  top:50%;
+  height:2px;
+  transform:translateY(-50%);
+  border-radius:999px;
+
+  background: rgba(0,0,0,0.95);   /* цвет полоски */
+  opacity: 0;                    /* OFF: не видно */
+}
+
+/* ON: полоска появляется */
+.toggleLine.on::before{
+  opacity: 1;
+}
+    .rowBtns{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .chip{
+      border:1px solid var(--line);
+      background:var(--soft);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      font-size:20px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:72px;
+    }
+    .chip:hover{background:var(--soft2);}
+    .chip:active{transform:translateY(1px);}
+  #btnReset{
+  font-size:18px;
+  min-width:120px;
+  margin-left:22px;   /* <-- отодвигает кнопку вправо от A ∧ B */
+}
+    #btnReset{
+  font-size:18px;
+  min-width:120px;
+  margin-left:22px;
+
+  background: rgba(0,0,0,.75);
+  border-color: rgba(0,0,0,.75);
+  color: #ffffff;
+}
+#btnReset:hover{ background: rgba(0,0,0,.85); }
+#btnReset:active{ transform: translateY(1px); }
+
+    /* Right: result only (no buttons) */
+    .rightBlock{
+      flex:1 1 260px;
+      min-width:260px;
+      align-self:flex-end; /* aligns with button row baseline-ish */
+    }
+    .resultLabel{
+      font-size:12px;
+      color:rgba(0,0,0,.55);
+      margin-bottom:4px;
+    }
+    .result{
+      display:inline-block;
+      position:relative;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:20px;
+      padding:2px 4px;
+      white-space:nowrap;
+      overflow:auto;
+      max-width:100%;
+    }
+    /* Non-clickable overline for result (shows outer negation) */
+    .result.overlined::before{
+      content:"";
+      position:absolute;
+      left:0;
+      right:0;
+      top:-6px;
+      height:2px;
+      background:#000;
+      border-radius:999px;
+    }
+
+    canvas{
+      width:100%;
+      height:420px;
+      background:#fff;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.10);
+      margin-top:12px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Круги Эйлера для двух множеств</h1>
+
+    <div class="muted">
+      <div>Кликая по множеству меняем состояние по кругу: ∅ → A → Ā.</div>
+      <div>Операторы: ∧ / ∨.</div>
+      <div>Отрицание: линия над выражением </div>
+    </div>
+
+    <div class="controlsLine">
+      <!-- Left: clickable negation line + buttons -->
+      <div class="leftBlock" id="leftBlock">
+        <div id="toggleLine" class="toggleLine" title="Нажми: включить/выключить общее отрицание"></div>
+
+<div class="rowBtns">
+  <div class="rowBtns" id="btnRow">
+    <div id="btnA" class="chip" title="∅ → A → Ā">A</div>
+    <div id="btnOp" class="chip" title="∧ / ∨">∧</div>
+    <div id="btnB" class="chip" title="∅ → B → B̄">B</div>
+  </div>
+  <div id="btnReset" class="chip" title="Сброс">Сброс</div>
+      <!-- Right: result only -->
+      <div class="rightBlock">
+        <div class="resultLabel">Результат:</div>
+        <div id="resultText" class="result"></div>
+      </div>
+    </div>
+
+    <canvas id="c" width="900" height="520"></canvas>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  const btnA = document.getElementById('btnA');
+  const btnB = document.getElementById('btnB');
+  const btnOp = document.getElementById('btnOp');
+  const btnReset = document.getElementById('btnReset');
+  const toggleLine = document.getElementById('toggleLine');
+  const btnRow = document.getElementById('btnRow');
+  const resultText = document.getElementById('resultText');
+
+  const state = {
+    A: { x: 0, y: 0, r: 0 },
+    B: { x: 0, y: 0, r: 0 },
+    deviceScale: 1,
+    dragging: null,
+    userMoved: false,
+
+    aMode: 1, // 0=∅, 1=A, 2=Ā
+    bMode: 1, // 0=∅, 1=B, 2=B̄
+    op: '&',  // '&' = ∧, '|' = ∨
+    outerNot: false
+  };
+
+  // --- Size circles centered nicely ---
+  function setDefaultCircles(){
+    const w = canvas.width, h = canvas.height;
+    const r = Math.min(w, h) * 0.28;
+    const cx = w * 0.50;
+    const cy = h * 0.55;
+    const dx = r * 0.72;
+    state.A = { x: cx - dx, y: cy, r };
+    state.B = { x: cx + dx, y: cy, r };
+  }
+
+  function resizeForDPR(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    state.deviceScale = dpr;
+
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+
+    // make the clickable line exactly the width of the buttons group
+    toggleLine.style.maxWidth = btnRow.getBoundingClientRect().width + "px";
+
+    if(!state.userMoved) setDefaultCircles();
+    draw();
+  }
+
+  // --- Boolean engine ---
+  const precedence = { '!': 4, '&': 3, '|': 1 };
+  const rightAssoc = { '!': true };
+
+  function tokenize(s){
+    const t = [];
+    for(let i=0;i<s.length;i++){
+      const c = s[i];
+      if (c==='A'||c==='B') t.push({type:'var', v:c});
+      else if (c==='!'||c==='&'||c==='|') t.push({type:'op', v:c});
+      else if (c==='('||c===')') t.push({type:'par', v:c});
+      else throw new Error(`bad char: ${c}`);
+    }
+    return t;
+  }
+
+  function toRPN(tokens){
+    const out=[], ops=[];
+    for(const tok of tokens){
+      if(tok.type==='var') out.push(tok);
+      else if(tok.type==='op'){
+        const o1=tok.v;
+        while(ops.length){
+          const top=ops[ops.length-1];
+          if(top.type!=='op') break;
+          const o2=top.v;
+          const p1=precedence[o1], p2=precedence[o2];
+          if ((rightAssoc[o1] && p1 < p2) || (!rightAssoc[o1] && p1 <= p2)) out.push(ops.pop());
+          else break;
+        }
+        ops.push(tok);
+      } else if(tok.type==='par' && tok.v==='(') ops.push(tok);
+      else if(tok.type==='par' && tok.v===')'){
+        while(ops.length){
+          const top=ops.pop();
+          if(top.type==='par' && top.v==='(') break;
+          out.push(top);
+        }
+      }
+    }
+    while(ops.length) out.push(ops.pop());
+    return out;
+  }
+
+  function evalRPN(rpn, A, B){
+    const st=[];
+    for(const tok of rpn){
+      if(tok.type==='var') st.push(tok.v==='A'?A:B);
+      else if(tok.type==='op'){
+        if(tok.v==='!') st.push(!st.pop());
+        else {
+          const b=st.pop(), a=st.pop();
+          st.push(tok.v==='&' ? (a && b) : (a || b));
+        }
+      }
+    }
+    return st[0];
+  }
+
+  function compile(expr){
+    const rpn = toRPN(tokenize(expr));
+    return { rpn };
+  }
+
+  // --- Build expression ---
+  function modeToExpr(which, mode){
+    if(mode===0) return '';
+    if(mode===1) return which;
+    return '!' + which;
+  }
+
+  function buildExpression(){
+    const a = modeToExpr('A', state.aMode);
+    const b = modeToExpr('B', state.bMode);
+
+    let core = '';
+    if(a && b) core = `(${a}${state.op}${b})`;
+    else if(a) core = a;
+    else if(b) core = b;
+    else core = '(A|!A)'; // both ∅ => everything
+
+    return state.outerNot ? `!(${core})` : core;
+  }
+
+  // --- Pretty display ---
+  function overbar(letter){ return letter + '\u0305'; }
+  function modeLabel(letter, mode){
+    if(mode===0) return '∅';
+    if(mode===1) return letter;
+    return overbar(letter);
+  }
+  function opLabel(op){ return op==='&' ? '∧' : '∨'; }
+
+  let compiled = compile(buildExpression());
+
+  function refreshUI(){
+    btnA.textContent = modeLabel('A', state.aMode);
+    btnB.textContent = modeLabel('B', state.bMode);
+    btnOp.textContent = opLabel(state.op);
+
+    toggleLine.classList.toggle('on', state.outerNot);
+
+    // result text (no buttons here)
+    const pA = modeLabel('A', state.aMode);
+    const pB = modeLabel('B', state.bMode);
+    const pOp = opLabel(state.op);
+
+    let core = '';
+    if(state.aMode!==0 && state.bMode!==0) core = `(${pA} ${pOp} ${pB})`;
+    else if(state.aMode!==0) core = `${pA}`;
+    else if(state.bMode!==0) core = `${pB}`;
+    else core = '⊤';
+
+    // show ¬(…) visually as an overline (non-clickable) sized to the formula
+    resultText.textContent = core;
+    resultText.classList.toggle('overlined', state.outerNot);
+
+    compiled = compile(buildExpression());
+    draw();
+  }
+
+  // --- Drawing ---
+  function insideCircle(px, py, circle){
+    const dx=px-circle.x, dy=py-circle.y;
+    return dx*dx+dy*dy <= circle.r*circle.r;
+  }
+
+  function draw(){
+    const w = canvas.width, h = canvas.height;
+
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,w,h);
+
+    // orange highlight
+    const img = ctx.getImageData(0,0,w,h);
+    const data = img.data;
+
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        const A = insideCircle(x,y,state.A);
+        const B = insideCircle(x,y,state.B);
+        const on = evalRPN(compiled.rpn, A, B);
+        if(on){
+          const i=(y*w+x)*4;
+          data[i+0]=255; // R
+          data[i+1]=165; // G
+          data[i+2]=0;   // B
+          data[i+3]=120; // alpha
+        }
+      }
+    }
+    ctx.putImageData(img,0,0);
+
+    // outlines + draggable labels
+    function circleOutline(c,label){
+      ctx.beginPath();
+      ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+      ctx.lineWidth = 3*state.deviceScale;
+      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      ctx.stroke();
+
+     
+
+      ctx.fillStyle='rgba(0,0,0,0.95)';
+      ctx.font=`${25*state.deviceScale}px system-ui,-apple-system,Segoe UI,Roboto,Arial`;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(label,c.x,c.y+0.5*state.deviceScale);
+    }
+    circleOutline(state.A,'A');
+    circleOutline(state.B,'B');
+  }
+
+  // --- Controls ---
+  btnA.addEventListener('click', () => { state.aMode = (state.aMode + 1) % 3; refreshUI(); });
+  btnB.addEventListener('click', () => { state.bMode = (state.bMode + 1) % 3; refreshUI(); });
+  btnOp.addEventListener('click', () => { state.op = (state.op === '&') ? '|' : '&'; refreshUI(); });
+  toggleLine.addEventListener('click', () => { state.outerNot = !state.outerNot; refreshUI(); });
+
+  btnReset.addEventListener('click', () => {
+    state.userMoved = false;
+    setDefaultCircles();
+    state.aMode = 1; state.bMode = 1; state.op='&'; state.outerNot=false;
+    refreshUI();
+  });
+
+  // --- Drag circles (by inner labels) ---
+  function canvasPoint(evt){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = state.deviceScale;
+    return { x:(evt.clientX-rect.left)*dpr, y:(evt.clientY-rect.top)*dpr };
+  }
+  function hitLabel(p,c){
+    const rr = (22*state.deviceScale)*(22*state.deviceScale);
+    const dx=p.x-c.x, dy=p.y-c.y;
+    return dx*dx+dy*dy <= rr;
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    const p = canvasPoint(e);
+    if(hitLabel(p,state.A)) { state.dragging='A'; state.userMoved=true; }
+    else if(hitLabel(p,state.B)) { state.dragging='B'; state.userMoved=true; }
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if(!state.dragging) return;
+    const p = canvasPoint(e);
+    const c = (state.dragging==='A') ? state.A : state.B;
+    c.x = p.x; c.y = p.y;
+    draw();
+  });
+  canvas.addEventListener('pointerup', () => { state.dragging=null; });
+  canvas.addEventListener('pointercancel', () => { state.dragging=null; });
+
+  // --- Boot ---
+  window.addEventListener('resize', resizeForDPR);
+  resizeForDPR();
+  refreshUI();
+})();
+</script>
+</body>
+</html>
