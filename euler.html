@@ -1,10 +1,34 @@
 <!doctype html>
 <html lang="ru">
 <head>
+    
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Круги Эйлера для двух множеств</title>
   <style>
+.topInfo{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px;
+}
+  .cycleLine{
+  text-align:center;
+   font-size:1.1em;
+  margin:4px 0 2px 0;
+}
+.opsTitle{
+   margin-top:2px;
+}
+.cornerLogo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+}
+.ops{
+  margin:4px 0 0 18px;
+  padding:0;
+}
     :root{
       --bg:#ffffff;
       --text:#000000;
@@ -15,17 +39,17 @@
     }
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+   font-family:'Poiret One', sans-serif;
       background:var(--bg);
       color:var(--text);
     }
     .wrap{max-width:980px;margin:0 auto;padding:18px;}
     .card{
       background:#fff;
-      border:1px solid rgba(0,0,0,.10);
+      border:1px solid rgba(0,0,0,0);
       border-radius:16px;
       padding:14px;
-      box-shadow:0 10px 30px rgba(0,0,0,.07);
+     
     }
     h1{
       font-size:18px;
@@ -38,11 +62,11 @@
 
     /* ---- Controls row layout ---- */
     .controlsLine{
-      margin-top:12px;
-      display:flex;
-      gap:18px;
-      align-items:flex-start;
-      flex-wrap:wrap;
+     margin-top:12px;
+  display:flex;
+  gap:18px;
+  align-items:center;
+  flex-wrap:wrap;
     }
 
     /* Left: buttons block */
@@ -89,36 +113,46 @@
 .toggleLine.on::before{
   opacity: 1;
 }
+.mainBtns{
+  display:flex;
+  gap:10px;
+  flex-wrap:nowrap;
+}
     .rowBtns{
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
     }
     .chip{
-      border:1px solid var(--line);
-      background:var(--soft);
-      color:var(--text);
-      padding:10px 14px;
-      border-radius:999px;
-      cursor:pointer;
-      user-select:none;
-      font-size:20px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:72px;
-    }
+  border:1px solid var(--line);
+  background:var(--soft);
+  color:var(--text);
+
+  padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2vw, 14px);
+  border-radius:999px;
+
+  cursor:pointer;
+  user-select:none;
+
+  font-size: clamp(14px, 2.2vw, 20px);
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-width: clamp(44px, 10vw, 72px);
+}
     .chip:hover{background:var(--soft2);}
     .chip:active{transform:translateY(1px);}
   #btnReset{
-  font-size:18px;
-  min-width:120px;
+font-size: clamp(14px, 2vw, 18px);
+  min-width: clamp(80px, 20vw, 120px);
   margin-left:22px;   /* <-- отодвигает кнопку вправо от A ∧ B */
 }
     #btnReset{
-  font-size:18px;
-  min-width:120px;
+font-size: clamp(14px, 2vw, 18px);
+  min-width: clamp(80px, 20vw, 120px);
   margin-left:22px;
 
   background: rgba(0,0,0,.75);
@@ -130,36 +164,32 @@
 
     /* Right: result only (no buttons) */
     .rightBlock{
-      flex:1 1 260px;
-      min-width:260px;
-      align-self:flex-end; /* aligns with button row baseline-ish */
+   display:flex;
+  align-items:center;
+  gap:8px;
     }
     .resultLabel{
-      font-size:12px;
-      color:rgba(0,0,0,.55);
-      margin-bottom:4px;
+   font-size:12px;
+  color:rgba(0,0,0,.55);
+  margin:0;
+  line-height:1;
     }
     .result{
-  display:inline-block;
+        display:inline-flex;
+  align-items:center;
   position:relative;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
   font-size:20px;
-  padding:8px 4px 2px;   /* сверху добавили место под линию */
+  line-height:1;
+
+  padding:6px 4px 2px;
   white-space:nowrap;
-  overflow:visible;      /* чтобы линия сверху не обрезалась */
+  overflow:visible;
   max-width:100%;
+
+  vertical-align:middle;
     }
-    /* Non-clickable overline for result (shows outer negation) */
-    .result.overlined::before{
-      content:"";
-      position:absolute;
-      left:0;
-      right:0;
-      top:2px;
-      height:2px;
-      background:#000;
-      border-radius:999px;
-    }
+ 
     
     canvas{
       width:100%;
@@ -167,38 +197,73 @@
       background:#fff;
       border-radius:14px;
       border:1px solid rgba(0,0,0,.10);
-      margin-top:12px;
+      margin-top:8px;
     }
   </style>
+  
+  <script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <h1>Круги Эйлера для двух множеств</h1>
 
-    <div class="muted">
-      <div>Кликая по множеству меняем состояние по кругу: ∅ → A → Ā.</div>
-      <div>Операторы: ∧ / ∨.</div>
-      <div>Отрицание: линия над выражением </div>
+<div class="topInfo">
+
+  <div class="muted">
+
+    <div>
+      Кликая по множеству меняем состояние по кругу:
     </div>
 
+    <div class="cycleLine">
+      \( \varnothing \rightarrow A \rightarrow \overline{A} \)
+    </div>
+
+    <div class="opsTitle">
+      Операторы:
+    </div>
+
+     <ul class="ops">
+      <li>\(A \cap B\) — пересечение</li>
+      <li>\(A \cup B\) — объединение</li>
+    </ul>
+
+  </div>
+
+  <img src="logo.png" class="cornerLogo">
+
+</div>
+
+</div>
     <div class="controlsLine">
       <!-- Left: clickable negation line + buttons -->
       <div class="leftBlock" id="leftBlock">
         <div id="toggleLine" class="toggleLine" title="Нажми: включить/выключить общее отрицание"></div>
 
 <div class="rowBtns">
-  <div class="rowBtns" id="btnRow">
+  <div class="mainBtns" id="btnRow">
     <div id="btnA" class="chip" title="∅ → A → Ā">A</div>
     <div id="btnOp" class="chip" title="∧ / ∨">∧</div>
     <div id="btnB" class="chip" title="∅ → B → B̄">B</div>
   </div>
   <div id="btnReset" class="chip" title="Сброс">Сброс</div>
+</div>
+
       <!-- Right: result only -->
-      <div class="rightBlock">
-        <div class="resultLabel">Результат:</div>
-        <div id="resultText" class="result"></div>
-      </div>
+    <div class="rightBlock">
+  <span class="resultLabel">Результат:</span>
+  <span id="resultText" class="result"></span>
+</div>
     </div>
 
     <canvas id="c" width="900" height="520"></canvas>
@@ -336,27 +401,33 @@
     if(a && b) core = `(${a}${state.op}${b})`;
     else if(a) core = a;
     else if(b) core = b;
-    else core = '(A|!A)'; // both ∅ => everything
+    else core = '(A&!A)'; // both ∅ => nothing
 
     return state.outerNot ? `!(${core})` : core;
   }
 
   // --- Pretty display ---
-  function overbar(letter){ return letter + '\u0305'; }
+
+function overbar(letter){
+  return `\\overline{${letter}}`;
+}
   function modeLabel(letter, mode){
     if(mode===0) return '∅';
     if(mode===1) return letter;
     return overbar(letter);
   }
-  function opLabel(op){ return op==='&' ? '∧' : '∨'; }
+function opLabel(op){
+  return op === '&' ? '\\cap' : '\\cup';
+}
 
   let compiled = compile(buildExpression());
 
   function refreshUI(){
-    btnA.textContent = modeLabel('A', state.aMode);
-    btnB.textContent = modeLabel('B', state.bMode);
-    btnOp.textContent = opLabel(state.op);
-
+      btnA.innerHTML = `\\(${modeLabel('A', state.aMode)}\\)`;
+btnB.innerHTML = `\\(${modeLabel('B', state.bMode)}\\)`;
+MathJax.typesetPromise([btnA, btnB]);
+   btnOp.innerHTML = `\\(${opLabel(state.op)}\\)`;
+MathJax.typesetPromise([btnA, btnB, btnOp, resultText]);
     toggleLine.classList.toggle('on', state.outerNot);
 
     // result text (no buttons here)
@@ -365,14 +436,23 @@
     const pOp = opLabel(state.op);
 
     let core = '';
-    if(state.aMode!==0 && state.bMode!==0) core = `(${pA} ${pOp} ${pB})`;
+   if(state.aMode!==0 && state.bMode!==0)
+  core = `(${pA} ${pOp} ${pB})`;
     else if(state.aMode!==0) core = `${pA}`;
     else if(state.bMode!==0) core = `${pB}`;
-    else core = '⊤';
-
+    else core = '\\varnothing';
+    
     // show ¬(…) visually as an overline (non-clickable) sized to the formula
-    resultText.textContent = core;
-    resultText.classList.toggle('overlined', state.outerNot);
+let latex = core;
+
+if(core === '\\varnothing' && state.outerNot){
+  latex = '\\forall';
+} else if(state.outerNot){
+  latex = `\\overline{${core}}`;
+}
+
+resultText.innerHTML = `\\(${latex}\\)`;
+MathJax.typesetPromise([resultText]);
 
     compiled = compile(buildExpression());
     draw();
@@ -440,7 +520,7 @@
   btnReset.addEventListener('click', () => {
     state.userMoved = false;
     setDefaultCircles();
-    state.aMode = 1; state.bMode = 1; state.op='&'; state.outerNot=false;
+    state.aMode = 1; state.bMode = 0; state.op='&'; state.outerNot=false;
     refreshUI();
   });
 
