@@ -1,0 +1,24 @@
+const store = miro.board.storage.collection("euler");
+const KEY = "shared-state";
+
+const defaultState = {
+  left: "empty",
+  right: "empty",
+  op: "and",
+  negated: false,
+};
+
+async function init(render) {
+  const current = await store.get(KEY);
+  if (!current) await store.set(KEY, defaultState);
+
+  await store.onValue(KEY, (value) => {
+    render(value || defaultState);
+  });
+}
+
+async function updateState(patch) {
+  const current = (await store.get(KEY)) || defaultState;
+  const next = { ...current, ...patch };
+  await store.set(KEY, next);
+}
