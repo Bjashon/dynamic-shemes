@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="ru">
 <head>
-    
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Круги Эйлера для двух множеств</title>
@@ -12,13 +11,13 @@
   align-items:flex-start;
   gap:20px;
 }
-  .cycleLine{
+.cycleLine{
   text-align:center;
-   font-size:1.1em;
+  font-size:1.1em;
   margin:4px 0 2px 0;
 }
 .opsTitle{
-   margin-top:2px;
+  margin-top:2px;
 }
 .cornerLogo{
   width:90px;
@@ -29,64 +28,58 @@
   margin:4px 0 0 18px;
   padding:0;
 }
-    :root{
-      --bg:#ffffff;
-      --text:#000000;
-      --muted:#333333;
-      --line:rgba(0,0,0,.18);
-      --soft:rgba(0,0,0,.05);
-      --soft2:rgba(0,0,0,.08);
-    }
-    body{
-      margin:0;
-   font-family:'Poiret One', sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .wrap{max-width:980px;margin:0 auto;padding:18px;}
-    .card{
-      background:#fff;
-      border:1px solid rgba(0,0,0,0);
-      border-radius:16px;
-      padding:14px;
-     
-    }
-    h1{
-      font-size:18px;
-      margin:0 0 10px;
-      font-weight:650;
-      text-align:center;
-    }
-    .muted{color:var(--muted); font-size:13px; line-height:1.35;}
-    .muted div{margin:2px 0;}
+:root{
+  --bg:#ffffff;
+  --text:#000000;
+  --muted:#333333;
+  --line:rgba(0,0,0,.18);
+  --soft:rgba(0,0,0,.05);
+  --soft2:rgba(0,0,0,.08);
+}
+body{
+  margin:0;
+  font-family:'Poiret One', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.wrap{max-width:980px;margin:0 auto;padding:18px;}
+.card{
+  background:#fff;
+  border:1px solid rgba(0,0,0,0);
+  border-radius:16px;
+  padding:14px;
+}
+h1{
+  font-size:18px;
+  margin:0 0 10px;
+  font-weight:650;
+  text-align:center;
+}
+.muted{color:var(--muted); font-size:13px; line-height:1.35;}
+.muted div{margin:2px 0;}
 
-    /* ---- Controls row layout ---- */
-    .controlsLine{
-     margin-top:12px;
+.controlsLine{
+  margin-top:12px;
   display:flex;
   gap:18px;
   align-items:center;
   flex-wrap:wrap;
-    }
+}
 
-    /* Left: buttons block */
-    .leftBlock{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      align-items:flex-start;
-    }
+.leftBlock{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:flex-start;
+}
 
-    /* Clickable "grey button" overline above buttons */
 .toggleLine{
   width:100%;
-  max-width: 420px;              /* ширину ты уже подгоняешь JS-ом */
-  height:18px;                   /* чуть выше, как у кнопки */
+  max-width:420px;
+  height:18px;
   cursor:pointer;
   user-select:none;
   position:relative;
-
-  /* вид как у серых кнопок */
   border:1px solid var(--line);
   background:var(--soft);
   border-radius:999px;
@@ -94,7 +87,6 @@
 .toggleLine:hover{ background:var(--soft2); }
 .toggleLine:active{ transform: translateY(1px); }
 
-/* Внутренняя полоска (по умолчанию скрыта) */
 .toggleLine::before{
   content:"";
   position:absolute;
@@ -104,57 +96,45 @@
   height:2px;
   transform:translateY(-50%);
   border-radius:999px;
-
-  background: rgba(0,0,0,0.95);   /* цвет полоски */
-  opacity: 0;                    /* OFF: не видно */
+  background: rgba(0,0,0,0.95);
+  opacity: 0;
 }
-
-/* ON: полоска появляется */
 .toggleLine.on::before{
   opacity: 1;
 }
+
 .mainBtns{
   display:flex;
   gap:10px;
   flex-wrap:nowrap;
 }
-    .rowBtns{
-      display:flex;
+.rowBtns{
+  display:flex;
   gap:10px;
   flex-wrap:wrap;
   align-items:center;
-    }
-    .chip{
+}
+.chip{
   border:1px solid var(--line);
   background:var(--soft);
   color:var(--text);
-
   padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2vw, 14px);
   border-radius:999px;
-
   cursor:pointer;
   user-select:none;
-
   font-size: clamp(14px, 2.2vw, 20px);
-
   display:inline-flex;
   align-items:center;
   justify-content:center;
-
   min-width: clamp(44px, 10vw, 72px);
 }
-    .chip:hover{background:var(--soft2);}
-    .chip:active{transform:translateY(1px);}
-  #btnReset{
-font-size: clamp(14px, 2vw, 18px);
-  min-width: clamp(80px, 20vw, 120px);
-  margin-left:22px;   /* <-- отодвигает кнопку вправо от A ∧ B */
-}
-    #btnReset{
-font-size: clamp(14px, 2vw, 18px);
+.chip:hover{background:var(--soft2);}
+.chip:active{transform:translateY(1px);}
+
+#btnReset{
+  font-size: clamp(14px, 2vw, 18px);
   min-width: clamp(80px, 20vw, 120px);
   margin-left:22px;
-
   background: rgba(0,0,0,.75);
   border-color: rgba(0,0,0,.75);
   color: #ffffff;
@@ -162,45 +142,40 @@ font-size: clamp(14px, 2vw, 18px);
 #btnReset:hover{ background: rgba(0,0,0,.85); }
 #btnReset:active{ transform: translateY(1px); }
 
-    /* Right: result only (no buttons) */
-    .rightBlock{
-   display:flex;
+.rightBlock{
+  display:flex;
   align-items:center;
   gap:8px;
-    }
-    .resultLabel{
-   font-size:12px;
+}
+.resultLabel{
+  font-size:12px;
   color:rgba(0,0,0,.55);
   margin:0;
   line-height:1;
-    }
-    .result{
-        display:inline-flex;
+}
+.result{
+  display:inline-flex;
   align-items:center;
   position:relative;
-
   font-size:20px;
   line-height:1;
-
   padding:6px 4px 2px;
   white-space:nowrap;
   overflow:visible;
   max-width:100%;
-
   vertical-align:middle;
-    }
- 
-    
-    canvas{
-      width:100%;
-      height:400px;
-      background:#fff;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.10);
-      margin-top:8px;
-    }
+}
+
+canvas{
+  width:100%;
+  height:400px;
+  background:#fff;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.10);
+  margin-top:8px;
+}
   </style>
-  
+
   <script>
 window.MathJax = {
   tex: { inlineMath: [['\\(','\\)']] },
@@ -209,7 +184,6 @@ window.MathJax = {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-
 <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -217,53 +191,49 @@ window.MathJax = {
   <div class="card">
     <h1>Круги Эйлера для двух множеств</h1>
 
-<div class="topInfo">
+    <div class="topInfo">
+      <div class="muted">
+        <div>
+          Кликая по множеству меняем состояние по кругу:
+        </div>
 
-  <div class="muted">
+        <div class="cycleLine">
+          \( \varnothing \rightarrow A \rightarrow \overline{A} \)
+        </div>
 
-    <div>
-      Кликая по множеству меняем состояние по кругу:
+        <div class="opsTitle">
+          Операторы:
+        </div>
+
+        <ul class="ops">
+          <li>\(A \cap B\) — пересечение</li>
+          <li>\(A \cup B\) — объединение</li>
+          <li>\(A \setminus B\) — разность</li>
+          <li>\(A \triangle B\) — симметрическая разность</li>
+        </ul>
+      </div>
+
+      <img src="logo.png" class="cornerLogo">
     </div>
-
-    <div class="cycleLine">
-      \( \varnothing \rightarrow A \rightarrow \overline{A} \)
-    </div>
-
-    <div class="opsTitle">
-      Операторы:
-    </div>
-
-     <ul class="ops">
-      <li>\(A \cap B\) — пересечение</li>
-      <li>\(A \cup B\) — объединение</li>
-    </ul>
-
   </div>
 
-  <img src="logo.png" class="cornerLogo">
+  <div class="controlsLine">
+    <div class="leftBlock" id="leftBlock">
+      <div id="toggleLine" class="toggleLine" title="Нажми: включить/выключить общее отрицание"></div>
 
-</div>
+      <div class="rowBtns">
+        <div class="mainBtns" id="btnRow">
+          <div id="btnA" class="chip" title="∅ → A → Ā">A</div>
+          <div id="btnOp" class="chip" title="∩ / ∪ / \ / △">∧</div>
+          <div id="btnB" class="chip" title="∅ → B → B̄">B</div>
+        </div>
+        <div id="btnReset" class="chip" title="Сброс">Сброс</div>
+      </div>
 
-</div>
-    <div class="controlsLine">
-      <!-- Left: clickable negation line + buttons -->
-      <div class="leftBlock" id="leftBlock">
-        <div id="toggleLine" class="toggleLine" title="Нажми: включить/выключить общее отрицание"></div>
-
-<div class="rowBtns">
-  <div class="mainBtns" id="btnRow">
-    <div id="btnA" class="chip" title="∅ → A → Ā">A</div>
-    <div id="btnOp" class="chip" title="∧ / ∨">∧</div>
-    <div id="btnB" class="chip" title="∅ → B → B̄">B</div>
-  </div>
-  <div id="btnReset" class="chip" title="Сброс">Сброс</div>
-</div>
-
-      <!-- Right: result only -->
-    <div class="rightBlock">
-  <span class="resultLabel">Результат:</span>
-  <span id="resultText" class="result"></span>
-</div>
+      <div class="rightBlock">
+        <span class="resultLabel">Результат:</span>
+        <span id="resultText" class="result"></span>
+      </div>
     </div>
 
     <canvas id="c" width="900" height="520"></canvas>
@@ -283,6 +253,8 @@ window.MathJax = {
   const btnRow = document.getElementById('btnRow');
   const resultText = document.getElementById('resultText');
 
+  const OPS = ['&', '|', '\\\\', '^'];
+
   const state = {
     A: { x: 0, y: 0, r: 0 },
     B: { x: 0, y: 0, r: 0 },
@@ -292,11 +264,10 @@ window.MathJax = {
 
     aMode: 1, // 0=∅, 1=A, 2=Ā
     bMode: 0, // 0=∅, 1=B, 2=B̄
-    op: '&',  // '&' = ∧, '|' = ∨
+    op: '&',  // &, |, \\, ^
     outerNot: false
   };
 
-  // --- Size circles centered nicely ---
   function setDefaultCircles(){
     const w = canvas.width, h = canvas.height;
     const r = Math.min(w, h) * 0.28;
@@ -315,25 +286,31 @@ window.MathJax = {
     canvas.width  = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
 
-    // make the clickable line exactly the width of the buttons group
     toggleLine.style.maxWidth = btnRow.getBoundingClientRect().width + "px";
 
     if(!state.userMoved) setDefaultCircles();
     draw();
   }
 
-  // --- Boolean engine ---
-  const precedence = { '!': 4, '&': 3, '|': 1 };
+  const precedence = { '!': 4, '&': 3, '\\\\': 3, '^': 2, '|': 1 };
   const rightAssoc = { '!': true };
 
   function tokenize(s){
     const t = [];
     for(let i=0;i<s.length;i++){
       const c = s[i];
-      if (c==='A'||c==='B') t.push({type:'var', v:c});
-      else if (c==='!'||c==='&'||c==='|') t.push({type:'op', v:c});
-      else if (c==='('||c===')') t.push({type:'par', v:c});
-      else throw new Error(`bad char: ${c}`);
+
+      if (c === 'A' || c === 'B') {
+        t.push({type:'var', v:c});
+      } else if (c === '!' || c === '&' || c === '|' || c === '^') {
+        t.push({type:'op', v:c});
+      } else if (c === '\\') {
+        t.push({type:'op', v:'\\\\'});
+      } else if (c === '(' || c === ')') {
+        t.push({type:'par', v:c});
+      } else {
+        throw new Error(`bad char: ${c}`);
+      }
     }
     return t;
   }
@@ -341,8 +318,9 @@ window.MathJax = {
   function toRPN(tokens){
     const out=[], ops=[];
     for(const tok of tokens){
-      if(tok.type==='var') out.push(tok);
-      else if(tok.type==='op'){
+      if(tok.type==='var') {
+        out.push(tok);
+      } else if(tok.type==='op'){
         const o1=tok.v;
         while(ops.length){
           const top=ops[ops.length-1];
@@ -353,8 +331,9 @@ window.MathJax = {
           else break;
         }
         ops.push(tok);
-      } else if(tok.type==='par' && tok.v==='(') ops.push(tok);
-      else if(tok.type==='par' && tok.v===')'){
+      } else if(tok.type==='par' && tok.v==='(') {
+        ops.push(tok);
+      } else if(tok.type==='par' && tok.v===')'){
         while(ops.length){
           const top=ops.pop();
           if(top.type==='par' && top.v==='(') break;
@@ -369,12 +348,17 @@ window.MathJax = {
   function evalRPN(rpn, A, B){
     const st=[];
     for(const tok of rpn){
-      if(tok.type==='var') st.push(tok.v==='A'?A:B);
-      else if(tok.type==='op'){
-        if(tok.v==='!') st.push(!st.pop());
-        else {
+      if(tok.type==='var') {
+        st.push(tok.v==='A'?A:B);
+      } else if(tok.type==='op'){
+        if(tok.v==='!') {
+          st.push(!st.pop());
+        } else {
           const b=st.pop(), a=st.pop();
-          st.push(tok.v==='&' ? (a && b) : (a || b));
+          if(tok.v==='&') st.push(a && b);
+          else if(tok.v==='|') st.push(a || b);
+          else if(tok.v==='\\\\') st.push(a && !b);
+          else if(tok.v==='^') st.push((a && !b) || (!a && b));
         }
       }
     }
@@ -386,11 +370,18 @@ window.MathJax = {
     return { rpn };
   }
 
-  // --- Build expression ---
   function modeToExpr(which, mode){
     if(mode===0) return '';
     if(mode===1) return which;
     return '!' + which;
+  }
+
+  function combineExpr(a, b, op){
+    if(op === '&') return `(${a}&${b})`;
+    if(op === '|') return `(${a}|${b})`;
+    if(op === '\\\\') return `(${a}\\${b})`;
+    if(op === '^') return `(${a}^${b})`;
+    return `(${a}&${b})`;
   }
 
   function buildExpression(){
@@ -398,67 +389,71 @@ window.MathJax = {
     const b = modeToExpr('B', state.bMode);
 
     let core = '';
-    if(a && b) core = `(${a}${state.op}${b})`;
+    if(a && b) core = combineExpr(a, b, state.op);
     else if(a) core = a;
     else if(b) core = b;
-    else core = '(A&!A)'; // both ∅ => nothing
+    else core = '(A&!A)';
 
     return state.outerNot ? `!(${core})` : core;
   }
 
-  // --- Pretty display ---
+  function overbar(letter){
+    return `\\overline{${letter}}`;
+  }
 
-function overbar(letter){
-  return `\\overline{${letter}}`;
-}
   function modeLabel(letter, mode){
-    if(mode===0) return '∅';
+    if(mode===0) return '\\varnothing';
     if(mode===1) return letter;
     return overbar(letter);
   }
-function opLabel(op){
-  return op === '&' ? '\\cap' : '\\cup';
-}
+
+  function opLabel(op){
+    if(op === '&') return '\\cap';
+    if(op === '|') return '\\cup';
+    if(op === '\\\\') return '\\setminus';
+    if(op === '^') return '\\triangle';
+    return '\\cap';
+  }
 
   let compiled = compile(buildExpression());
 
   function refreshUI(){
-      btnA.innerHTML = `\\(${modeLabel('A', state.aMode)}\\)`;
-btnB.innerHTML = `\\(${modeLabel('B', state.bMode)}\\)`;
-MathJax.typesetPromise([btnA, btnB]);
-   btnOp.innerHTML = `\\(${opLabel(state.op)}\\)`;
-MathJax.typesetPromise([btnA, btnB, btnOp, resultText]);
+    btnA.innerHTML = `\\(${modeLabel('A', state.aMode)}\\)`;
+    btnB.innerHTML = `\\(${modeLabel('B', state.bMode)}\\)`;
+    btnOp.innerHTML = `\\(${opLabel(state.op)}\\)`;
+
     toggleLine.classList.toggle('on', state.outerNot);
 
-    // result text (no buttons here)
     const pA = modeLabel('A', state.aMode);
     const pB = modeLabel('B', state.bMode);
     const pOp = opLabel(state.op);
 
     let core = '';
-   if(state.aMode!==0 && state.bMode!==0)
-  core = `(${pA} ${pOp} ${pB})`;
-    else if(state.aMode!==0) core = `${pA}`;
-    else if(state.bMode!==0) core = `${pB}`;
-    else core = '\\varnothing';
-    
-    // show ¬(…) visually as an overline (non-clickable) sized to the formula
-let latex = core;
+    if(state.aMode!==0 && state.bMode!==0) {
+      core = `(${pA} ${pOp} ${pB})`;
+    } else if(state.aMode!==0) {
+      core = `${pA}`;
+    } else if(state.bMode!==0) {
+      core = `${pB}`;
+    } else {
+      core = '\\varnothing';
+    }
 
-if(core === '\\varnothing' && state.outerNot){
-  latex = '\\forall';
-} else if(state.outerNot){
-  latex = `\\overline{${core}}`;
-}
+    let latex = core;
+    if(core === '\\varnothing' && state.outerNot){
+      latex = '\\forall';
+    } else if(state.outerNot){
+      latex = `\\overline{${core}}`;
+    }
 
-resultText.innerHTML = `\\(${latex}\\)`;
-MathJax.typesetPromise([resultText]);
+    resultText.innerHTML = `\\(${latex}\\)`;
+
+    MathJax.typesetPromise([btnA, btnB, btnOp, resultText]);
 
     compiled = compile(buildExpression());
     draw();
   }
 
-  // --- Drawing ---
   function insideCircle(px, py, circle){
     const dx=px-circle.x, dy=py-circle.y;
     return dx*dx+dy*dy <= circle.r*circle.r;
@@ -471,7 +466,6 @@ MathJax.typesetPromise([resultText]);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0,0,w,h);
 
-    // orange highlight
     const img = ctx.getImageData(0,0,w,h);
     const data = img.data;
 
@@ -482,16 +476,15 @@ MathJax.typesetPromise([resultText]);
         const on = evalRPN(compiled.rpn, A, B);
         if(on){
           const i=(y*w+x)*4;
-          data[i+0]=255; // R
-          data[i+1]=165; // G
-          data[i+2]=0;   // B
-          data[i+3]=120; // alpha
+          data[i+0]=255;
+          data[i+1]=165;
+          data[i+2]=0;
+          data[i+3]=120;
         }
       }
     }
     ctx.putImageData(img,0,0);
 
-    // outlines + draggable labels
     function circleOutline(c,label){
       ctx.beginPath();
       ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
@@ -499,37 +492,54 @@ MathJax.typesetPromise([resultText]);
       ctx.strokeStyle = 'rgba(0,0,0,0.95)';
       ctx.stroke();
 
-     
-
       ctx.fillStyle='rgba(0,0,0,0.95)';
       ctx.font=`${25*state.deviceScale}px system-ui,-apple-system,Segoe UI,Roboto,Arial`;
       ctx.textAlign='center';
       ctx.textBaseline='middle';
       ctx.fillText(label,c.x,c.y+0.5*state.deviceScale);
     }
+
     circleOutline(state.A,'A');
     circleOutline(state.B,'B');
   }
 
-  // --- Controls ---
-  btnA.addEventListener('click', () => { state.aMode = (state.aMode + 1) % 3; refreshUI(); });
-  btnB.addEventListener('click', () => { state.bMode = (state.bMode + 1) % 3; refreshUI(); });
-  btnOp.addEventListener('click', () => { state.op = (state.op === '&') ? '|' : '&'; refreshUI(); });
-  toggleLine.addEventListener('click', () => { state.outerNot = !state.outerNot; refreshUI(); });
+  btnA.addEventListener('click', () => {
+    state.aMode = (state.aMode + 1) % 3;
+    refreshUI();
+  });
+
+  btnB.addEventListener('click', () => {
+    state.bMode = (state.bMode + 1) % 3;
+    refreshUI();
+  });
+
+  btnOp.addEventListener('click', () => {
+    const idx = OPS.indexOf(state.op);
+    state.op = OPS[(idx + 1) % OPS.length];
+    refreshUI();
+  });
+
+  toggleLine.addEventListener('click', () => {
+    state.outerNot = !state.outerNot;
+    refreshUI();
+  });
 
   btnReset.addEventListener('click', () => {
     state.userMoved = false;
     setDefaultCircles();
-    state.aMode = 1; state.bMode = 0; state.op='&'; state.outerNot=false;
+    state.aMode = 1;
+    state.bMode = 0;
+    state.op = '&';
+    state.outerNot = false;
     refreshUI();
   });
 
-  // --- Drag circles (by inner labels) ---
   function canvasPoint(evt){
     const rect = canvas.getBoundingClientRect();
     const dpr = state.deviceScale;
     return { x:(evt.clientX-rect.left)*dpr, y:(evt.clientY-rect.top)*dpr };
   }
+
   function hitLabel(p,c){
     const rr = (22*state.deviceScale)*(22*state.deviceScale);
     const dx=p.x-c.x, dy=p.y-c.y;
@@ -539,20 +549,27 @@ MathJax.typesetPromise([resultText]);
   canvas.addEventListener('pointerdown', (e) => {
     canvas.setPointerCapture(e.pointerId);
     const p = canvasPoint(e);
-    if(hitLabel(p,state.A)) { state.dragging='A'; state.userMoved=true; }
-    else if(hitLabel(p,state.B)) { state.dragging='B'; state.userMoved=true; }
+    if(hitLabel(p,state.A)) {
+      state.dragging='A';
+      state.userMoved=true;
+    } else if(hitLabel(p,state.B)) {
+      state.dragging='B';
+      state.userMoved=true;
+    }
   });
+
   canvas.addEventListener('pointermove', (e) => {
     if(!state.dragging) return;
     const p = canvasPoint(e);
     const c = (state.dragging==='A') ? state.A : state.B;
-    c.x = p.x; c.y = p.y;
+    c.x = p.x;
+    c.y = p.y;
     draw();
   });
+
   canvas.addEventListener('pointerup', () => { state.dragging=null; });
   canvas.addEventListener('pointercancel', () => { state.dragging=null; });
 
-  // --- Boot ---
   window.addEventListener('resize', resizeForDPR);
   resizeForDPR();
   refreshUI();
