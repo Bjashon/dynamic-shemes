@@ -209,12 +209,15 @@
     }
   </style>
 
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['\\(','\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(','\\)']] },
+    svg: { fontCache: 'global' },
+    options: {
+      enableMenu: false
+    }
+  };
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
