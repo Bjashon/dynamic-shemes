@@ -425,26 +425,29 @@ window.MathJax = {
     toggleLine.classList.toggle('on', state.outerNot);
 
     const pA = modeLabel('A', state.aMode);
-    const pB = modeLabel('B', state.bMode);
-    const pOp = opLabel(state.op);
+const pB = modeLabel('B', state.bMode);
+const pOp = opLabel(state.op);
 
-    let core = '';
-    if(state.aMode!==0 && state.bMode!==0) {
-      core = `(${pA} ${pOp} ${pB})`;
-    } else if(state.aMode!==0) {
-      core = `${pA}`;
-    } else if(state.bMode!==0) {
-      core = `${pB}`;
-    } else {
-      core = '\\varnothing';
-    }
+let core = '';
+let needsParens = false;
 
-    let latex = core;
-    if(core === '\\varnothing' && state.outerNot){
-      latex = '\\forall';
-    } else if(state.outerNot){
-      latex = `\\overline{${core}}`;
-    }
+if(state.aMode!==0 && state.bMode!==0) {
+  core = `${pA} ${pOp} ${pB}`;
+  needsParens = true;
+} else if(state.aMode!==0) {
+  core = `${pA}`;
+} else if(state.bMode!==0) {
+  core = `${pB}`;
+} else {
+  core = '\\varnothing';
+}
+
+let latex = core;
+if(core === '\\varnothing' && state.outerNot){
+  latex = '\\forall';
+} else if(state.outerNot){
+  latex = needsParens ? `\\overline{\\left(${core}\\right)}` : `\\overline{${core}}`;
+}
 
     resultText.innerHTML = `\\(${latex}\\)`;
 
