@@ -53,14 +53,14 @@
     .wrap{
       max-width:980px;
       margin:0 auto;
-      padding:18px;
+      padding:0 18px 18px;
     }
 
     .card{
       background:#fff;
       border:1px solid rgba(0,0,0,0);
       border-radius:16px;
-      padding:14px;
+      padding:0 14px 14px;
     }
 
     h1{
@@ -84,7 +84,7 @@
       margin-top:12px;
       display:flex;
       gap:18px;
-      align-items:center;
+      align-items:flex-start;
       flex-wrap:wrap;
     }
 
@@ -93,6 +93,8 @@
       flex-direction:column;
       gap:8px;
       align-items:flex-start;
+      flex:1 1 320px;
+      min-width:0;
     }
 
     .toggleLine{
@@ -128,96 +130,158 @@
     }
 
     .mainBtns{
-      display:flex;
-      gap:10px;
-      flex-wrap:nowrap;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:8px;
+      min-width:0;
     }
 
     .rowBtns{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:8px;
       align-items:center;
+      width:100%;
+      max-width:420px;
     }
 
     .chip{
       border:1px solid var(--line);
       background:var(--soft);
       color:var(--text);
-      padding:clamp(6px, 1.5vw, 10px) clamp(10px, 2vw, 14px);
+      padding:8px 12px;
       border-radius:999px;
       cursor:pointer;
       user-select:none;
       -webkit-user-select:none;
       -webkit-touch-callout:none;
       touch-action:manipulation;
-      font-size:clamp(14px, 2.2vw, 20px);
+      font-size:18px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:clamp(44px, 10vw, 72px);
+      min-width:54px;
+      min-height:40px;
+      box-sizing:border-box;
     }
 
     .chip:hover{ background:var(--soft2); }
     .chip:active{ transform:translateY(1px); }
 
     #btnReset{
-      font-size:clamp(14px, 2vw, 18px);
-      min-width:clamp(80px, 20vw, 120px);
-      margin-left:22px;
+      font-size:16px;
+      min-width:86px;
+      margin-left:0;
       background:rgba(0,0,0,.75);
       border-color:rgba(0,0,0,.75);
       color:#ffffff;
+      padding:8px 14px;
     }
 
     #btnReset:hover{ background:rgba(0,0,0,.85); }
     #btnReset:active{ transform: translateY(1px); }
 
     .rightBlock{
-      display:flex;
+      display:grid;
+      grid-template-columns:auto 1fr;
+      column-gap:12px;
       align-items:center;
-      gap:8px;
+      width:100%;
+      max-width:420px;
+      height:104px;
+      overflow:visible;
     }
 
     .resultLabel{
-      font-size:12px;
-      color:rgba(0,0,0,.55);
+      font-size:20px;
+      color:rgba(0,0,0,.7);
       margin:0;
       line-height:1;
+      padding-top:0;
+      align-self:center;
     }
 
     .result{
       display:inline-flex;
       align-items:center;
       position:relative;
-      font-size:20px;
+      font-size:32px;
       line-height:1;
-      padding:6px 4px 2px;
+      padding:6px 4px;
       white-space:nowrap;
       overflow:visible;
       max-width:100%;
+      height:76px;
       vertical-align:middle;
     }
 
     canvas{
       width:100%;
-      height:400px;
+      height:360px;
       background:#fff;
       border-radius:14px;
       border:1px solid rgba(0,0,0,.10);
       margin-top:8px;
+      flex:1 1 420px;
+      min-width:0;
+    }
+
+    @media (max-width: 640px){
+      .topInfo{
+        gap:12px;
+      }
+
+      .cornerLogo{
+        width:72px;
+        height:72px;
+      }
+
+      .rowBtns,
+      .toggleLine{
+        max-width:none;
+      }
+
+      .chip{
+        font-size:16px;
+        min-width:48px;
+        min-height:38px;
+        padding:7px 10px;
+      }
+
+      #btnReset{
+        min-width:84px;
+        font-size:15px;
+        padding:7px 12px;
+      }
+
+      .rightBlock{
+        height:92px;
+      }
+
+      .resultLabel{
+        font-size:18px;
+      }
+
+      .result{
+        font-size:28px;
+        height:68px;
+      }
+
+      canvas{
+        height:300px;
+      }
     }
   </style>
 
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['\\(','\\)']] },
-    svg: { fontCache: 'global' },
-    options: {
-      enableMenu: false
-    }
-  };
-</script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)']] },
+      svg: { fontCache: 'global' },
+      options: {
+        enableMenu: false
+      }
+    };
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
@@ -300,7 +364,6 @@
     deviceScale: 1,
     dragging: null,
     userMoved: false,
-
     aMode: 1,
     bMode: 0,
     op: '&',
@@ -315,12 +378,42 @@
     return (v - 1 + len) % len;
   }
 
+  function safeTypeset(elements){
+    if (!window.MathJax) return;
+
+    if (window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => {
+        if (typeof window.MathJax.typesetPromise === 'function') {
+          return window.MathJax.typesetPromise(elements);
+        }
+        if (typeof window.MathJax.typeset === 'function') {
+          window.MathJax.typeset(elements);
+        }
+      }).catch((err) => {
+        console.error('MathJax startup/typeset error:', err);
+      });
+      return;
+    }
+
+    try {
+      if (typeof window.MathJax.typesetPromise === 'function') {
+        window.MathJax.typesetPromise(elements).catch((err) => {
+          console.error('MathJax typesetPromise error:', err);
+        });
+      } else if (typeof window.MathJax.typeset === 'function') {
+        window.MathJax.typeset(elements);
+      }
+    } catch (err) {
+      console.error('MathJax typeset error:', err);
+    }
+  }
+
   function setDefaultCircles(){
     const w = canvas.width;
     const h = canvas.height;
-    const r = Math.min(w, h) * 0.28;
+    const r = Math.min(w, h) * 0.27;
     const cx = w * 0.50;
-    const cy = h * 0.48;
+    const cy = h * 0.45;
     const dx = r * 0.72;
     state.A = { x: cx - dx, y: cy, r };
     state.B = { x: cx + dx, y: cy, r };
@@ -331,8 +424,8 @@
     state.deviceScale = dpr;
 
     const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
 
     toggleLine.style.maxWidth = btnRow.getBoundingClientRect().width + 'px';
 
@@ -592,10 +685,9 @@
     }
 
     resultText.innerHTML = `\\(${latex}\\)`;
-    MathJax.typesetPromise([btnA, btnB, btnOp, resultText]);
-
     compiled = compile(buildExpression());
     draw();
+    safeTypeset([btnA, btnB, btnOp, resultText]);
   }
 
   function insideCircle(px, py, circle){
@@ -728,6 +820,20 @@
     el.addEventListener('pointerleave', cancelPress);
   }
 
+  function runSmokeTests(){
+    console.assert(nextMode(0, 3) === 1, 'nextMode forward');
+    console.assert(prevMode(0, 3) === 2, 'prevMode backward');
+    console.assert(modeToExpr('A', 0) === '', 'modeToExpr empty');
+    console.assert(modeToExpr('A', 1) === 'A', 'modeToExpr normal');
+    console.assert(modeToExpr('A', 2) === '!A', 'modeToExpr negated');
+    console.assert(evalRPN(toRPN(tokenize('(A&B)')), true, true) === true, 'intersection tt');
+    console.assert(evalRPN(toRPN(tokenize('(A&B)')), true, false) === false, 'intersection tf');
+    console.assert(evalRPN(toRPN(tokenize('(A|B)')), false, true) === true, 'union ft');
+    console.assert(evalRPN(toRPN(tokenize('(A\\B)')), true, false) === true, 'difference tf');
+    console.assert(evalRPN(toRPN(tokenize('(A^B)')), true, true) === false, 'xor tt');
+    console.assert(evalRPN(toRPN(tokenize('(A^B)')), true, false) === true, 'xor tf');
+  }
+
   attachForwardBackwardControl(btnA, cycleAForward, cycleABackward);
   attachForwardBackwardControl(btnB, cycleBForward, cycleBBackward);
   attachForwardBackwardControl(btnOp, cycleOpForward, cycleOpBackward);
@@ -796,6 +902,7 @@
 
   window.addEventListener('resize', resizeForDPR);
 
+  runSmokeTests();
   resizeForDPR();
   refreshUI();
 })();
