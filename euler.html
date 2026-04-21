@@ -284,6 +284,7 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://miro.com/app/static/sdk/v2/miro.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
 </head>
 
@@ -357,6 +358,7 @@
   const OPS = ['&', '|', '\\\\', '^'];
   const EMPTY_EXPR = '(A&!A)';
   const LONG_PRESS_MS = 450;
+  const SAVE_THROTTLE_MS = 60;
 
   const state = {
     A: { x: 0, y: 0, r: 0 },
@@ -367,8 +369,19 @@
     aMode: 1,
     bMode: 0,
     op: '&',
-    outerNot: false
+    outerNot: false,
+    sharedGeometry: null
   };
+
+  const HAS_MIRO = typeof window.miro !== 'undefined'
+    && miro.board
+    && miro.board.storage
+    && typeof miro.board.storage.collection === 'function';
+
+  const collection = HAS_MIRO ? miro.board.storage.collection('euler') : null;
+  const KEY = 'shared-state';
+
+  let saveTimer = null;
 
   function nextMode(v, len){
     return (v + 1) % len;
@@ -408,15 +421,113 @@
     }
   }
 
+  function exportGeometry(){
+    const w = Math.max(1, canvas.width);
+    const h = Math.max(1, canvas.height);
+    const m = Math.max(1, Math.min(w, h));
+
+    return {
+      Ax: state.A.x / w,
+      Ay: state.A.y / h,
+      Ar: state.A.r / m,
+      Bx: state.B.x / w,
+      By: state.B.y / h,
+      Br: state.B.r / m
+    };
+  }
+
+  function applyGeometry(geometry){
+    if (!geometry) return;
+
+    const w = Math.max(1, canvas.width);
+    const h = Math.max(1, canvas.height);
+    const m = Math.max(1, Math.min(w, h));
+
+    state.A = {
+      x: geometry.Ax * w,
+      y: geometry.Ay * h,
+      r: geometry.Ar * m
+    };
+
+    state.B = {
+      x: geometry.Bx * w,
+      y: geometry.By * h,
+      r: geometry.Br * m
+    };
+
+    state.sharedGeometry = geometry;
+    state.userMoved = true;
+  }
+
   function setDefaultCircles(){
     const w = canvas.width;
     const h = canvas.height;
     const r = Math.min(w, h) * 0.27;
     const cx = w * 0.50;
     const cy = h * 0.45;
-    const dx = r * 0.72;
+    const dx = r * 0.92;
+
     state.A = { x: cx - dx, y: cy, r };
     state.B = { x: cx + dx, y: cy, r };
+    state.sharedGeometry = exportGeometry();
+  }
+
+  function exportSharedState(){
+    return {
+      aMode: state.aMode,
+      bMode: state.bMode,
+      op: state.op,
+      outerNot: state.outerNot,
+      geometry: exportGeometry()
+    };
+  }
+
+  function applySharedState(shared){
+    if (!shared) return;
+
+    if (typeof shared.aMode === 'number') state.aMode = shared.aMode;
+    if (typeof shared.bMode === 'number') state.bMode = shared.bMode;
+    if (typeof shared.op === 'string') state.op = shared.op;
+    if (typeof shared.outerNot === 'boolean') state.outerNot = shared.outerNot;
+    if (shared.geometry) applyGeometry(shared.geometry);
+  }
+
+  async function saveSharedState(){
+    if (!collection) return;
+    await collection.set(KEY, exportSharedState());
+  }
+
+  function scheduleSaveSharedState(){
+    if (!collection) return;
+    if (saveTimer) return;
+
+    saveTimer = setTimeout(async () => {
+      saveTimer = null;
+      try {
+        await saveSharedState();
+      } catch (err) {
+        console.error('Miro save error:', err);
+      }
+    }, SAVE_THROTTLE_MS);
+  }
+
+  async function initSharedState(){
+    if (!collection) return;
+
+    const current = await collection.get(KEY);
+    if (current) {
+      applySharedState(current);
+    } else {
+      setDefaultCircles();
+      await collection.set(KEY, exportSharedState());
+    }
+
+    await collection.onValue(KEY, (value) => {
+      if (!value) return;
+      if (state.dragging) return;
+      applySharedState(value);
+      refreshUI(false);
+    });
   }
 
   function resizeForDPR(){
@@ -429,7 +540,12 @@
 
     toggleLine.style.maxWidth = btnRow.getBoundingClientRect().width + 'px';
 
-    if(!state.userMoved) setDefaultCircles();
+    if (state.sharedGeometry) {
+      applyGeometry(state.sharedGeometry);
+    } else {
+      setDefaultCircles();
+    }
+
     draw();
   }
 
@@ -663,7 +779,7 @@
     return { core, needsParens };
   }
 
-  function refreshUI(){
+  function refreshUI(doSync = true){
     btnA.innerHTML = `\\(${modeLabel('A', state.aMode)}\\)`;
     btnB.innerHTML = `\\(${modeLabel('B', state.bMode)}\\)`;
     btnOp.innerHTML = `\\(${opLabel(state.op)}\\)`;
@@ -688,6 +804,10 @@
     compiled = compile(buildExpression());
     draw();
     safeTypeset([btnA, btnB, btnOp, resultText]);
+
+    if (doSync) {
+      scheduleSaveSharedState();
+    }
   }
 
   function insideCircle(px, py, circle){
@@ -733,7 +853,7 @@
       ctx.stroke();
 
       ctx.fillStyle = 'rgba(0,0,0,0.95)';
-      ctx.font = `${25 * state.deviceScale}px system-ui,-apple-system,Segoe UI,Roboto,Arial`;
+      ctx.font = `italic ${30 * state.deviceScale}px "STIX Two Text", "Cambria Math", "Times New Roman", serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(label, c.x, c.y + 0.5 * state.deviceScale);
@@ -822,7 +942,7 @@
 
   function runSmokeTests(){
     console.assert(nextMode(0, 3) === 1, 'nextMode forward');
-    console.assert(prevMode(0, 3) === 2, 'prevMode backward');
+    console.assert(prevMode(0, 3) === 2, 'nextMode backward');
     console.assert(modeToExpr('A', 0) === '', 'modeToExpr empty');
     console.assert(modeToExpr('A', 1) === 'A', 'modeToExpr normal');
     console.assert(modeToExpr('A', 2) === '!A', 'modeToExpr negated');
@@ -832,6 +952,9 @@
     console.assert(evalRPN(toRPN(tokenize('(A\\B)')), true, false) === true, 'difference tf');
     console.assert(evalRPN(toRPN(tokenize('(A^B)')), true, true) === false, 'xor tt');
     console.assert(evalRPN(toRPN(tokenize('(A^B)')), true, false) === true, 'xor tf');
+    setDefaultCircles();
+    const g = exportGeometry();
+    console.assert(typeof g.Ax === 'number' && typeof g.Bx === 'number', 'geometry export');
   }
 
   attachForwardBackwardControl(btnA, cycleAForward, cycleABackward);
@@ -843,7 +966,7 @@
     refreshUI();
   });
 
-  btnReset.addEventListener('click', () => {
+  btnReset.addEventListener('click', async () => {
     state.userMoved = false;
     setDefaultCircles();
     state.aMode = 1;
@@ -851,6 +974,11 @@
     state.op = '&';
     state.outerNot = false;
     refreshUI();
+    try {
+      await saveSharedState();
+    } catch (err) {
+      console.error('Miro reset save error:', err);
+    }
   });
 
   function canvasPoint(evt){
@@ -889,11 +1017,20 @@
     const c = (state.dragging === 'A') ? state.A : state.B;
     c.x = p.x;
     c.y = p.y;
+    state.sharedGeometry = exportGeometry();
     draw();
+    scheduleSaveSharedState();
   });
 
-  canvas.addEventListener('pointerup', () => {
+  canvas.addEventListener('pointerup', async () => {
+    if (!state.dragging) return;
     state.dragging = null;
+    state.sharedGeometry = exportGeometry();
+    try {
+      await saveSharedState();
+    } catch (err) {
+      console.error('Miro drag save error:', err);
+    }
   });
 
   canvas.addEventListener('pointercancel', () => {
@@ -904,7 +1041,16 @@
 
   runSmokeTests();
   resizeForDPR();
-  refreshUI();
+
+  initSharedState()
+    .then(() => {
+      resizeForDPR();
+      refreshUI(false);
+    })
+    .catch((err) => {
+      console.error('Miro sync init error:', err);
+      refreshUI(false);
+    });
 })();
 </script>
 </body>
