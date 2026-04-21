@@ -1,0 +1,911 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Круги Эйлера для двух множеств</title>
+
+  <style>
+    .topInfo{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:20px;
+    }
+
+    .cycleLine{
+      text-align:center;
+      font-size:1.1em;
+      margin:4px 0 2px 0;
+    }
+
+    .opsTitle{
+      margin-top:2px;
+    }
+
+    .cornerLogo{
+      width:90px;
+      height:90px;
+      object-fit:contain;
+    }
+
+    .ops{
+      margin:4px 0 0 18px;
+      padding:0;
+    }
+
+    :root{
+      --bg:#ffffff;
+      --text:#000000;
+      --muted:#333333;
+      --line:rgba(0,0,0,.18);
+      --soft:rgba(0,0,0,.05);
+      --soft2:rgba(0,0,0,.08);
+    }
+
+    body{
+      margin:0;
+      font-family:'Poiret One', sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:10px 18px 18px;
+    }
+
+    .card{
+      background:#fff;
+      border:1px solid rgba(0,0,0,0);
+      border-radius:16px;
+      padding:0 14px 14px;
+    }
+
+    h1{
+      font-size:18px;
+      margin:0 0 10px;
+      font-weight:650;
+      text-align:center;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .muted div{
+      margin:2px 0;
+    }
+
+    .controlsLine{
+      margin-top:12px;
+      display:flex;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+
+    .leftBlock{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-start;
+      flex:1 1 320px;
+      min-width:0;
+    }
+
+    .toggleLine{
+      width:100%;
+      max-width:420px;
+      height:18px;
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+      border:1px solid var(--line);
+      background:var(--soft);
+      border-radius:999px;
+    }
+
+    .toggleLine:hover{ background:var(--soft2); }
+    .toggleLine:active{ transform: translateY(1px); }
+
+    .toggleLine::before{
+      content:"";
+      position:absolute;
+      left:10px;
+      right:10px;
+      top:50%;
+      height:2px;
+      transform:translateY(-50%);
+      border-radius:999px;
+      background:rgba(0,0,0,0.95);
+      opacity:0;
+    }
+
+    .toggleLine.on::before{
+      opacity:1;
+    }
+
+    .mainBtns{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:8px;
+      min-width:0;
+    }
+
+    .rowBtns{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:8px;
+      align-items:center;
+      width:100%;
+      max-width:420px;
+    }
+
+    .chip{
+      border:1px solid var(--line);
+      background:var(--soft);
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
+      touch-action:manipulation;
+      font-size:18px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:54px;
+      min-height:40px;
+      box-sizing:border-box;
+    }
+
+    .chip:hover{ background:var(--soft2); }
+    .chip:active{ transform:translateY(1px); }
+
+    #btnReset{
+      font-size:16px;
+      min-width:86px;
+      margin-left:0;
+      background:rgba(0,0,0,.75);
+      border-color:rgba(0,0,0,.75);
+      color:#ffffff;
+      padding:8px 14px;
+    }
+
+    #btnReset:hover{ background:rgba(0,0,0,.85); }
+    #btnReset:active{ transform: translateY(1px); }
+
+    .rightBlock{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      column-gap:12px;
+      align-items:center;
+      width:100%;
+      max-width:420px;
+      height:104px;
+      overflow:visible;
+    }
+
+    .resultLabel{
+      font-size:20px;
+      color:rgba(0,0,0,.7);
+      margin:0;
+      line-height:1;
+      padding-top:0;
+      align-self:center;
+    }
+
+    .result{
+      display:inline-flex;
+      align-items:center;
+      position:relative;
+      font-size:32px;
+      line-height:1;
+      padding:6px 4px;
+      white-space:nowrap;
+      overflow:visible;
+      max-width:100%;
+      height:76px;
+      vertical-align:middle;
+    }
+
+    canvas{
+      width:100%;
+      height:360px;
+      background:#fff;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.10);
+      margin-top:8px;
+      flex:1 1 420px;
+      min-width:0;
+    }
+
+    @media (max-width: 640px){
+      .topInfo{
+        gap:12px;
+      }
+
+      .cornerLogo{
+        width:72px;
+        height:72px;
+      }
+
+      .rowBtns,
+      .toggleLine{
+        max-width:none;
+      }
+
+      .chip{
+        font-size:16px;
+        min-width:48px;
+        min-height:38px;
+        padding:7px 10px;
+      }
+
+      #btnReset{
+        min-width:84px;
+        font-size:15px;
+        padding:7px 12px;
+      }
+
+      .rightBlock{
+        height:92px;
+      }
+
+      .resultLabel{
+        font-size:18px;
+      }
+
+      .result{
+        font-size:28px;
+        height:68px;
+      }
+
+      canvas{
+        height:300px;
+      }
+    }
+  </style>
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)']] },
+      svg: { fontCache: 'global' },
+      options: {
+        enableMenu: false
+      }
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Круги Эйлера для двух множеств</h1>
+
+    <div class="topInfo">
+      <div class="muted">
+        <div>
+          Кликая по множеству меняем состояние по кругу:
+        </div>
+
+        <div class="cycleLine">
+          \( \varnothing \rightarrow A \rightarrow \overline{A} \)
+        </div>
+
+        <div class="opsTitle">
+          Операторы:
+        </div>
+
+        <ul class="ops">
+          <li>\(A \cap B\) — пересечение</li>
+          <li>\(A \cup B\) — объединение</li>
+          <li>\(A \setminus B\) — разность</li>
+          <li>\(A \triangle B\) — симметрическая разность</li>
+        </ul>
+      </div>
+
+      <img src="logo.png" class="cornerLogo" alt="logo">
+    </div>
+  </div>
+
+  <div class="controlsLine">
+    <div class="leftBlock" id="leftBlock">
+      <div id="toggleLine" class="toggleLine" title="Нажми: включить/выключить общее отрицание"></div>
+
+      <div class="rowBtns">
+        <div class="mainBtns" id="btnRow">
+          <div id="btnA" class="chip" title="ЛКМ/тап: вперёд, ПКМ/долгое нажатие: назад">A</div>
+          <div id="btnOp" class="chip" title="ЛКМ/тап: вперёд, ПКМ/долгое нажатие: назад">∩</div>
+          <div id="btnB" class="chip" title="ЛКМ/тап: вперёд, ПКМ/долгое нажатие: назад">B</div>
+        </div>
+        <div id="btnReset" class="chip" title="Сброс">Сброс</div>
+      </div>
+
+      <div class="rightBlock">
+        <span class="resultLabel">Результат:</span>
+        <span id="resultText" class="result"></span>
+      </div>
+    </div>
+
+    <canvas id="c" width="900" height="520"></canvas>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  const btnA = document.getElementById('btnA');
+  const btnB = document.getElementById('btnB');
+  const btnOp = document.getElementById('btnOp');
+  const btnReset = document.getElementById('btnReset');
+  const toggleLine = document.getElementById('toggleLine');
+  const btnRow = document.getElementById('btnRow');
+  const resultText = document.getElementById('resultText');
+
+  const OPS = ['&', '|', '\\\\', '^'];
+  const EMPTY_EXPR = '(A&!A)';
+  const LONG_PRESS_MS = 450;
+
+  const state = {
+    A: { x: 0, y: 0, r: 0 },
+    B: { x: 0, y: 0, r: 0 },
+    deviceScale: 1,
+    dragging: null,
+    userMoved: false,
+    aMode: 1,
+    bMode: 0,
+    op: '&',
+    outerNot: false
+  };
+
+  function nextMode(v, len){
+    return (v + 1) % len;
+  }
+
+  function prevMode(v, len){
+    return (v - 1 + len) % len;
+  }
+
+  function safeTypeset(elements){
+    if (!window.MathJax) return;
+
+    if (window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => {
+        if (typeof window.MathJax.typesetPromise === 'function') {
+          return window.MathJax.typesetPromise(elements);
+        }
+        if (typeof window.MathJax.typeset === 'function') {
+          window.MathJax.typeset(elements);
+        }
+      }).catch((err) => {
+        console.error('MathJax startup/typeset error:', err);
+      });
+      return;
+    }
+
+    try {
+      if (typeof window.MathJax.typesetPromise === 'function') {
+        window.MathJax.typesetPromise(elements).catch((err) => {
+          console.error('MathJax typesetPromise error:', err);
+        });
+      } else if (typeof window.MathJax.typeset === 'function') {
+        window.MathJax.typeset(elements);
+      }
+    } catch (err) {
+      console.error('MathJax typeset error:', err);
+    }
+  }
+
+  function setDefaultCircles(){
+    const w = canvas.width;
+    const h = canvas.height;
+    const r = Math.min(w, h) * 0.27;
+    const cx = w * 0.50;
+    const cy = h * 0.45;
+    const dx = r * 0.72;
+    state.A = { x: cx - dx, y: cy, r };
+    state.B = { x: cx + dx, y: cy, r };
+  }
+
+  function resizeForDPR(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    state.deviceScale = dpr;
+
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+
+    toggleLine.style.maxWidth = btnRow.getBoundingClientRect().width + 'px';
+
+    if(!state.userMoved) setDefaultCircles();
+    draw();
+  }
+
+  const precedence = {
+    '!': 4,
+    '&': 3,
+    '\\\\': 3,
+    '^': 2,
+    '|': 1
+  };
+
+  const rightAssoc = {
+    '!': true
+  };
+
+  function tokenize(s){
+    const t = [];
+    for(let i = 0; i < s.length; i++){
+      const c = s[i];
+
+      if(c === 'A' || c === 'B'){
+        t.push({ type:'var', v:c });
+      } else if(c === '!' || c === '&' || c === '|' || c === '^'){
+        t.push({ type:'op', v:c });
+      } else if(c === '\\'){
+        t.push({ type:'op', v:'\\\\' });
+      } else if(c === '(' || c === ')'){
+        t.push({ type:'par', v:c });
+      } else {
+        throw new Error(`bad char: ${c}`);
+      }
+    }
+    return t;
+  }
+
+  function toRPN(tokens){
+    const out = [];
+    const ops = [];
+
+    for(const tok of tokens){
+      if(tok.type === 'var'){
+        out.push(tok);
+      } else if(tok.type === 'op'){
+        const o1 = tok.v;
+
+        while(ops.length){
+          const top = ops[ops.length - 1];
+          if(top.type !== 'op') break;
+
+          const o2 = top.v;
+          const p1 = precedence[o1];
+          const p2 = precedence[o2];
+
+          if(
+            (rightAssoc[o1] && p1 < p2) ||
+            (!rightAssoc[o1] && p1 <= p2)
+          ){
+            out.push(ops.pop());
+          } else {
+            break;
+          }
+        }
+
+        ops.push(tok);
+      } else if(tok.type === 'par' && tok.v === '('){
+        ops.push(tok);
+      } else if(tok.type === 'par' && tok.v === ')'){
+        while(ops.length){
+          const top = ops.pop();
+          if(top.type === 'par' && top.v === '(') break;
+          out.push(top);
+        }
+      }
+    }
+
+    while(ops.length) out.push(ops.pop());
+    return out;
+  }
+
+  function evalRPN(rpn, A, B){
+    const st = [];
+
+    for(const tok of rpn){
+      if(tok.type === 'var'){
+        st.push(tok.v === 'A' ? A : B);
+      } else if(tok.type === 'op'){
+        if(tok.v === '!'){
+          st.push(!st.pop());
+        } else {
+          const b = st.pop();
+          const a = st.pop();
+
+          if(tok.v === '&') st.push(a && b);
+          else if(tok.v === '|') st.push(a || b);
+          else if(tok.v === '\\\\') st.push(a && !b);
+          else if(tok.v === '^') st.push((a && !b) || (!a && b));
+        }
+      }
+    }
+
+    return st[0];
+  }
+
+  function compile(expr){
+    const rpn = toRPN(tokenize(expr));
+    return { rpn };
+  }
+
+  function modeToExpr(which, mode){
+    if(mode === 0) return '';
+    if(mode === 1) return which;
+    return '!' + which;
+  }
+
+  function combineExpr(a, b, op){
+    if(op === '&') return `(${a}&${b})`;
+    if(op === '|') return `(${a}|${b})`;
+    if(op === '\\\\') return `(${a}\\${b})`;
+    if(op === '^') return `(${a}^${b})`;
+    return `(${a}&${b})`;
+  }
+
+  function buildExpression(){
+    const a = modeToExpr('A', state.aMode);
+    const b = modeToExpr('B', state.bMode);
+
+    const aEmpty = state.aMode === 0;
+    const bEmpty = state.bMode === 0;
+
+    let core = '';
+
+    if(state.op === '&'){
+      if(aEmpty || bEmpty) core = EMPTY_EXPR;
+      else core = combineExpr(a, b, state.op);
+    }
+    else if(state.op === '|'){
+      if(aEmpty && bEmpty) core = EMPTY_EXPR;
+      else if(aEmpty) core = b;
+      else if(bEmpty) core = a;
+      else core = combineExpr(a, b, state.op);
+    }
+    else if(state.op === '\\\\'){
+      if(aEmpty) core = EMPTY_EXPR;
+      else if(bEmpty) core = a;
+      else core = combineExpr(a, b, state.op);
+    }
+    else if(state.op === '^'){
+      if(aEmpty && bEmpty) core = EMPTY_EXPR;
+      else if(aEmpty) core = b;
+      else if(bEmpty) core = a;
+      else core = combineExpr(a, b, state.op);
+    }
+
+    return state.outerNot ? `!(${core})` : core;
+  }
+
+  function overbar(letter){
+    return `\\overline{${letter}}`;
+  }
+
+  function modeLabel(letter, mode){
+    if(mode === 0) return '\\varnothing';
+    if(mode === 1) return letter;
+    return overbar(letter);
+  }
+
+  function opLabel(op){
+    if(op === '&') return '\\cap';
+    if(op === '|') return '\\cup';
+    if(op === '\\\\') return '\\setminus';
+    if(op === '^') return '\\triangle';
+    return '\\cap';
+  }
+
+  let compiled = compile(buildExpression());
+
+  function buildPrettyCore(){
+    const pA = modeLabel('A', state.aMode);
+    const pB = modeLabel('B', state.bMode);
+    const pOp = opLabel(state.op);
+
+    const aEmpty = state.aMode === 0;
+    const bEmpty = state.bMode === 0;
+
+    let core = '';
+    let needsParens = false;
+
+    if(state.op === '&'){
+      if(aEmpty || bEmpty){
+        core = '\\varnothing';
+      } else {
+        core = `${pA} ${pOp} ${pB}`;
+        needsParens = true;
+      }
+    }
+    else if(state.op === '|'){
+      if(aEmpty && bEmpty){
+        core = '\\varnothing';
+      } else if(aEmpty){
+        core = pB;
+      } else if(bEmpty){
+        core = pA;
+      } else {
+        core = `${pA} ${pOp} ${pB}`;
+        needsParens = true;
+      }
+    }
+    else if(state.op === '\\\\'){
+      if(aEmpty){
+        core = '\\varnothing';
+      } else if(bEmpty){
+        core = pA;
+      } else {
+        core = `${pA} ${pOp} ${pB}`;
+        needsParens = true;
+      }
+    }
+    else if(state.op === '^'){
+      if(aEmpty && bEmpty){
+        core = '\\varnothing';
+      } else if(aEmpty){
+        core = pB;
+      } else if(bEmpty){
+        core = pA;
+      } else {
+        core = `${pA} ${pOp} ${pB}`;
+        needsParens = true;
+      }
+    }
+
+    return { core, needsParens };
+  }
+
+  function refreshUI(){
+    btnA.innerHTML = `\\(${modeLabel('A', state.aMode)}\\)`;
+    btnB.innerHTML = `\\(${modeLabel('B', state.bMode)}\\)`;
+    btnOp.innerHTML = `\\(${opLabel(state.op)}\\)`;
+
+    toggleLine.classList.toggle('on', state.outerNot);
+
+    const pretty = buildPrettyCore();
+    const core = pretty.core;
+    const needsParens = pretty.needsParens;
+
+    let latex = core;
+
+    if(core === '\\varnothing' && state.outerNot){
+      latex = '\\forall';
+    } else if(state.outerNot){
+      latex = needsParens
+        ? `\\overline{\\left(${core}\\right)}`
+        : `\\overline{${core}}`;
+    }
+
+    resultText.innerHTML = `\\(${latex}\\)`;
+    compiled = compile(buildExpression());
+    draw();
+    safeTypeset([btnA, btnB, btnOp, resultText]);
+  }
+
+  function insideCircle(px, py, circle){
+    const dx = px - circle.x;
+    const dy = py - circle.y;
+    return dx * dx + dy * dy <= circle.r * circle.r;
+  }
+
+  function draw(){
+    const w = canvas.width;
+    const h = canvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+
+    const img = ctx.getImageData(0, 0, w, h);
+    const data = img.data;
+
+    for(let y = 0; y < h; y++){
+      for(let x = 0; x < w; x++){
+        const A = insideCircle(x, y, state.A);
+        const B = insideCircle(x, y, state.B);
+        const on = evalRPN(compiled.rpn, A, B);
+
+        if(on){
+          const i = (y * w + x) * 4;
+          data[i + 0] = 255;
+          data[i + 1] = 165;
+          data[i + 2] = 0;
+          data[i + 3] = 120;
+        }
+      }
+    }
+
+    ctx.putImageData(img, 0, 0);
+
+    function circleOutline(c, label){
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.lineWidth = 3 * state.deviceScale;
+      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(0,0,0,0.95)';
+      ctx.font = `${25 * state.deviceScale}px system-ui,-apple-system,Segoe UI,Roboto,Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, c.x, c.y + 0.5 * state.deviceScale);
+    }
+
+    circleOutline(state.A, 'A');
+    circleOutline(state.B, 'B');
+  }
+
+  function cycleAForward(){
+    state.aMode = nextMode(state.aMode, 3);
+    refreshUI();
+  }
+
+  function cycleABackward(){
+    state.aMode = prevMode(state.aMode, 3);
+    refreshUI();
+  }
+
+  function cycleBForward(){
+    state.bMode = nextMode(state.bMode, 3);
+    refreshUI();
+  }
+
+  function cycleBBackward(){
+    state.bMode = prevMode(state.bMode, 3);
+    refreshUI();
+  }
+
+  function cycleOpForward(){
+    const idx = OPS.indexOf(state.op);
+    state.op = OPS[(idx + 1) % OPS.length];
+    refreshUI();
+  }
+
+  function cycleOpBackward(){
+    const idx = OPS.indexOf(state.op);
+    state.op = OPS[(idx - 1 + OPS.length) % OPS.length];
+    refreshUI();
+  }
+
+  function attachForwardBackwardControl(el, forwardFn, backwardFn){
+    let timer = null;
+    let longPressTriggered = false;
+    let pointerDown = false;
+
+    el.addEventListener('click', (e) => {
+      if(longPressTriggered){
+        longPressTriggered = false;
+        e.preventDefault();
+        return;
+      }
+      forwardFn();
+    });
+
+    el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      backwardFn();
+    });
+
+    el.addEventListener('pointerdown', (e) => {
+      if(e.pointerType === 'mouse') return;
+      pointerDown = true;
+      longPressTriggered = false;
+
+      timer = setTimeout(() => {
+        if(pointerDown){
+          longPressTriggered = true;
+          backwardFn();
+        }
+      }, LONG_PRESS_MS);
+    });
+
+    function cancelPress(){
+      pointerDown = false;
+      if(timer){
+        clearTimeout(timer);
+        timer = null;
+      }
+    }
+
+    el.addEventListener('pointerup', cancelPress);
+    el.addEventListener('pointercancel', cancelPress);
+    el.addEventListener('pointerleave', cancelPress);
+  }
+
+  function runSmokeTests(){
+    console.assert(nextMode(0, 3) === 1, 'nextMode forward');
+    console.assert(prevMode(0, 3) === 2, 'prevMode backward');
+    console.assert(modeToExpr('A', 0) === '', 'modeToExpr empty');
+    console.assert(modeToExpr('A', 1) === 'A', 'modeToExpr normal');
+    console.assert(modeToExpr('A', 2) === '!A', 'modeToExpr negated');
+    console.assert(evalRPN(toRPN(tokenize('(A&B)')), true, true) === true, 'intersection tt');
+    console.assert(evalRPN(toRPN(tokenize('(A&B)')), true, false) === false, 'intersection tf');
+    console.assert(evalRPN(toRPN(tokenize('(A|B)')), false, true) === true, 'union ft');
+    console.assert(evalRPN(toRPN(tokenize('(A\\B)')), true, false) === true, 'difference tf');
+    console.assert(evalRPN(toRPN(tokenize('(A^B)')), true, true) === false, 'xor tt');
+    console.assert(evalRPN(toRPN(tokenize('(A^B)')), true, false) === true, 'xor tf');
+  }
+
+  attachForwardBackwardControl(btnA, cycleAForward, cycleABackward);
+  attachForwardBackwardControl(btnB, cycleBForward, cycleBBackward);
+  attachForwardBackwardControl(btnOp, cycleOpForward, cycleOpBackward);
+
+  toggleLine.addEventListener('click', () => {
+    state.outerNot = !state.outerNot;
+    refreshUI();
+  });
+
+  btnReset.addEventListener('click', () => {
+    state.userMoved = false;
+    setDefaultCircles();
+    state.aMode = 1;
+    state.bMode = 0;
+    state.op = '&';
+    state.outerNot = false;
+    refreshUI();
+  });
+
+  function canvasPoint(evt){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = state.deviceScale;
+    return {
+      x: (evt.clientX - rect.left) * dpr,
+      y: (evt.clientY - rect.top) * dpr
+    };
+  }
+
+  function hitLabel(p, c){
+    const rr = (22 * state.deviceScale) * (22 * state.deviceScale);
+    const dx = p.x - c.x;
+    const dy = p.y - c.y;
+    return dx * dx + dy * dy <= rr;
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    const p = canvasPoint(e);
+
+    if(hitLabel(p, state.A)){
+      state.dragging = 'A';
+      state.userMoved = true;
+    } else if(hitLabel(p, state.B)){
+      state.dragging = 'B';
+      state.userMoved = true;
+    }
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if(!state.dragging) return;
+
+    const p = canvasPoint(e);
+    const c = (state.dragging === 'A') ? state.A : state.B;
+    c.x = p.x;
+    c.y = p.y;
+    draw();
+  });
+
+  canvas.addEventListener('pointerup', () => {
+    state.dragging = null;
+  });
+
+  canvas.addEventListener('pointercancel', () => {
+    state.dragging = null;
+  });
+
+  window.addEventListener('resize', resizeForDPR);
+
+  runSmokeTests();
+  resizeForDPR();
+  refreshUI();
+})();
+</script>
+</body>
+</html>
