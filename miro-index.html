@@ -1,24 +1,20 @@
-const store = miro.board.storage.collection("euler");
-const KEY = "shared-state";
-
-const defaultState = {
-  left: "empty",
-  right: "empty",
-  op: "and",
-  negated: false,
-};
-
-async function init(render) {
-  const current = await store.get(KEY);
-  if (!current) await store.set(KEY, defaultState);
-
-  await store.onValue(KEY, (value) => {
-    render(value || defaultState);
-  });
-}
-
-async function updateState(patch) {
-  const current = (await store.get(KEY)) || defaultState;
-  const next = { ...current, ...patch };
-  await store.set(KEY, next);
-}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Euler Miro App</title>
+  <script src="https://miro.com/app/static/sdk/v2/miro.js"></script>
+</head>
+<body>
+  <script>
+    async function init() {
+      await miro.board.ui.on("icon:click", async () => {
+        await miro.board.ui.openPanel({
+          url: "https://bjashon.github.io/dynamic-shemes/euler.html"
+        });
+      });
+    }
+    init();
+  </script>
+</body>
+</html>
